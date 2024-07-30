@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"test/A2SV-PROJECT-PHASE-GO/wordfrequency"
+	"test/A2SV-PROJECT-PHASE-GO/task_2/wordfrequency"
 )
 
 func main() {
