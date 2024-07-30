@@ -67,20 +67,24 @@ func (stdt student) getStudentName() string {
 }
 
 func (stdt student) displayStudentInfo() {
+	fmt.Println("")
 	fmt.Printf("%v's grade report\n", stdt.name)
 	var sm float64
-	fmt.Printf("%-5v   %-20v   %-5v\n", "no", "subject", "grade")
-	fmt.Println("")
+	fmt.Println("_________________________________________")
+	fmt.Printf("|%-5v   |%-20v   |%-7v|\n", "no", "subject", "grade")
+	fmt.Println("_________________________________________")
 
 	for i, sub := range stdt.subjects {
 		v := strings.Trim(sub.name, "\n")
-		fmt.Printf("%-5v     %-20v  %-5.3f\n", i+1, v, sub.grade)
+		fmt.Printf("|%-5v   |%-20v   |%-7.3f|\n", i+1, v, sub.grade)
+		fmt.Println("_________________________________________")
 		sm += sub.grade
 	}
+	fmt.Printf("|%-15v|%-24.3f|\n", "total", sm)
+	fmt.Println("_________________________________________")
 
-	fmt.Println("")
-	fmt.Printf("%-8v :  %-20.3f\n", "total", sm)
-	fmt.Printf("%-8v :  %-20.3f\n", "average", sm/float64(len(stdt.subjects)))
+	fmt.Printf("|%-15v|%-24.3f|\n", "average", sm/float64(len(stdt.subjects)))
+	fmt.Println("_________________________________________")
 
 }
 
@@ -93,34 +97,52 @@ func IsLetterOnly(s string) bool {
 	return true
 }
 
+func askChoice(r *bufio.Reader) {
+	fmt.Println("")
+	fmt.Println("Student Grade Calculator")
+	fmt.Println("\tMenu")
+	fmt.Println("\t 1,Calculate Grade\n\t 2,Exit ")
+	var choice int
+	fmt.Scan(&choice)
+	switch choice {
+	case 1:
+		std1 := student{}
+		std1.name = std1.getStudentName()
+
+		fmt.Print("Enter the number of subjects taken: ")
+		var no_subjects string
+		fmt.Scan(&no_subjects)
+		number_of_subjects, err := strconv.Atoi(no_subjects)
+		for err != nil || number_of_subjects <= 0 {
+			fmt.Println(" ")
+			fmt.Printf("The number of subjects you entered ==> %v is invalid please enter a number: ", no_subjects)
+			fmt.Scan(&no_subjects)
+			number_of_subjects, err = strconv.Atoi(no_subjects)
+
+		}
+		var sm float64
+		for i := range number_of_subjects {
+			fmt.Println("")
+			sub := subject{}
+			fmt.Println("subject ", i+1)
+			sub.name = sub.getSubjectName(r)
+			sub.grade = sub.getSubjectGrade()
+			sm += sub.grade
+			std1.subjects = append(std1.subjects, sub)
+
+		}
+		std1.displayStudentInfo()
+		askChoice(r)
+	case 2:
+		fmt.Println("exiting...")
+		break
+	default:
+		askChoice(r)
+
+	}
+}
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-
-	std1 := student{}
-	std1.name = std1.getStudentName()
-
-	fmt.Print("Enter the number of subjects taken: ")
-	var no_subjects string
-	fmt.Scan(&no_subjects)
-	number_of_subjects, err := strconv.Atoi(no_subjects)
-	for err != nil || number_of_subjects <= 0 {
-		fmt.Println(" ")
-		fmt.Printf("The number of subjects you entered ==> %v is invalid please enter a number: ", no_subjects)
-		fmt.Scan(&no_subjects)
-		number_of_subjects, err = strconv.Atoi(no_subjects)
-
-	}
-	var sm float64
-	for i := range number_of_subjects {
-		fmt.Println("")
-		sub := subject{}
-		fmt.Println("subject ", i+1)
-		sub.name = sub.getSubjectName(reader)
-		sub.grade = sub.getSubjectGrade()
-		sm += sub.grade
-		std1.subjects = append(std1.subjects, sub)
-
-	}
-	std1.displayStudentInfo()
+	askChoice(reader)
 
 }
