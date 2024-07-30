@@ -75,12 +75,12 @@ func Add_Book() {
 	fmt.Printf("enter the title:")
 	title, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Errorf(err.Error())
+		fmt.Println(err.Error())
 	}
 	fmt.Printf("enter the author:")
 	author, err := reader.ReadString('\n')
 	if err != nil {
-		fmt.Errorf(err.Error())
+		fmt.Println(err.Error())
 	}
 	book := models.Book{
 		Id:     NextBookId,
