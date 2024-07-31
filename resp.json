@@ -1,0 +1,36 @@
+{
+    "status": "OK",
+    "result": {
+        "problems": [
+            {
+                "contestId": 1995,
+                "index": "E2",
+                "name": "Let Me Teach You a Lesson (Hard Version)",
+                "type": "PROGRAMMING",
+                "points": 1500.0,
+                "rating": 2900,
+                "tags": [
+                    "data structures",
+                    "dp",
+                    "matrices",
+                    "two pointers"
+                ]
+            },
+            {
+                "contestId": 1995,
+                "index": "E1",
+                "name": "Let Me Teach You a Lesson (Easy Version)",
+                "type": "PROGRAMMING",
+                "points": 2500.0,
+                "rating": 2700,
+                "tags": [
+                    "2-sat",
+                    "data structures",
+                    "dp",
+                    "matrices",
+                    "two pointers"
+                ]
+            }
+        ]
+}
+}

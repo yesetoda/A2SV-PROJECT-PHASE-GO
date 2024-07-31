@@ -2,7 +2,7 @@ package controller
 
 import (
 	"fmt"
-	"test/A2SV-PROJECT-PHASE-GO/task_3/models"
+	"example/task_3/models"
 )
 
 type Library struct {
@@ -13,9 +13,6 @@ type Library struct {
 func (lb *Library) AddBook(book models.Book) {
 	book.Status = true
 	lb.BookStore[book.Id] = book
-	fmt.Println("added", book)
-	fmt.Println(lb.BookStore)
-
 }
 
 func (lb *Library) RemoveBook(book models.Book) {
@@ -88,4 +85,20 @@ func (lb *Library) ListBorrowedBooks(id int) []models.Book {
 		fmt.Println(book)
 	}
 	return books
+}
+
+func (lb *Library) RegisterMember(member models.Member) {
+
+	lb.MemberList[member.Id] = member
+	fmt.Println("added", member.Name+"sucessfully ")
+
+}
+
+func (lb *Library) RemoveMember(memberId int) {
+	_, mfound := lb.MemberList[memberId]
+	if !mfound {
+		fmt.Println("the member with this id doesn't exist ")
+	}
+	delete(lb.MemberList, memberId)
+
 }

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"test/A2SV-PROJECT-PHASE-GO/task_3/models"
+	"example/task_3/models"
 )
 
 type LibraryManager interface {
