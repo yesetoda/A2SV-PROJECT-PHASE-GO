@@ -5,7 +5,7 @@ import (
 	"example/task_3/models"
 	"fmt"
 	"strconv"
-	"strings"c
+	"strings"
 
 	"bufio"
 	"os"
