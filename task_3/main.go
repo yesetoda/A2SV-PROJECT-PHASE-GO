@@ -4,7 +4,8 @@ import (
 	"example/task_3/controller"
 	"example/task_3/models"
 	"fmt"
-	"strings"
+	"strconv"
+	"strings"c
 
 	"bufio"
 	"os"
@@ -34,8 +35,15 @@ func main() {
 		10,View All Members
 		0,Exit
 		`)
-		var choice int
-		fmt.Scan(&choice)
+		var str_choice string
+		fmt.Print("Enter Your Choice: ")
+		fmt.Scan(&str_choice)
+		choice,err:= strconv.Atoi(str_choice)
+		if err!= nil{
+			fmt.Println("Invalid input!")
+			continue
+		}
+		fmt.Println()
 		switch choice {
 		case 1:
 			Add_Book()
@@ -65,6 +73,7 @@ func main() {
 			fmt.Println("exiting....")
 			return
 		default:
+			fmt.Println("Invalid input!")
 			continue
 		}
 	}
