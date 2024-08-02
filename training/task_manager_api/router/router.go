@@ -9,7 +9,7 @@ import (
 var ()
 
 func Router(router *gin.Engine, t controllers.TaskController) {
-	router.GET("/", func(c *gin.Context) { c.IndentedJSON(200, "this is the task manager api") })
+	router.GET("/", t.HandleLandingPage)
 	router.GET("/tasks", t.HandleGetAll)
 	router.GET("/tasks/:id", t.HandleGetById)
 	router.PUT("/tasks/:id", t.HandleUpdate)

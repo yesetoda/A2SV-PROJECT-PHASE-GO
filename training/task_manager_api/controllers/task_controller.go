@@ -13,8 +13,47 @@ type TaskController struct {
 	TaskList map[int]models.Task
 }
 
+func (t *TaskController) HandleLandingPage(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, gin.H{"List Of API's Avalilable": []map[string]map[string]string{
+		{"GET /": {
+			"description": "home",
+			"Body":        "",
+			"param":       "",
+		}},
+		{"GET /tasks": {
+			"description": "get all the tasks",
+			"Body":        "",
+			"param":       "",
+		}},
+		{"GET /tasks/id": {
+			"description": "get specifit task by id",
+			"param":       "id",
+			"Body":        "",
+		}},
+		{"PUT /tasks/id": {
+			"description": "update all fields of specific task",
+			"param":       "id",
+			"Body":        "all of title,description,due_date,status",
+		}},
+		{"PATCH /tasks/id": {
+			"description": "home",
+			"param":       "id",
+			"Body":        "any of title,description,due_date,status",
+		}},
+		{"DELETE /tasks/id": {
+			"description": "home",
+			"param":       "id",
+			"Body":        "",
+		}},
+		{"POST /tasks": {
+			"description": "home",
+			"param":       "",
+			"Body":        "all of id,title,description,due_date,status",
+		}},
+	}})
+}
 func (t *TaskController) HandleGetAll(c *gin.Context) {
-	c.IndentedJSON(200, t.TaskList)
+	c.IndentedJSON(http.StatusOK, t.TaskList)
 }
 
 func (t *TaskController) HandleGetById(c *gin.Context) {
@@ -29,7 +68,7 @@ func (t *TaskController) HandleGetById(c *gin.Context) {
 		c.IndentedJSON(404, "not task with such id")
 		return
 	}
-	c.IndentedJSON(200, task)
+	c.IndentedJSON(http.StatusOK, task)
 
 }
 func (t *TaskController) HandleUpdate(c *gin.Context) {
@@ -59,7 +98,7 @@ func (t *TaskController) HandleUpdate(c *gin.Context) {
 	delete(t.TaskList, int_id)
 	x, _ := strconv.Atoi(task.ID)
 	t.TaskList[x] = task
-	c.IndentedJSON(200, "Updated successfully")
+	c.IndentedJSON(http.StatusOK, "Updated successfully")
 
 }
 
@@ -105,7 +144,7 @@ func (t *TaskController) HandleUpdateField(c *gin.Context) {
 	x, _ := strconv.Atoi(task.ID)
 	delete(t.TaskList, int_id)
 	t.TaskList[x] = task
-	c.IndentedJSON(200, "Field Updated successfully")
+	c.IndentedJSON(http.StatusOK, "Field Updated successfully")
 
 }
 func (t *TaskController) HandleDelete(c *gin.Context) {
@@ -121,7 +160,7 @@ func (t *TaskController) HandleDelete(c *gin.Context) {
 		return
 	}
 	delete(t.TaskList, int_id)
-	c.IndentedJSON(200, "deleted succesfully")
+	c.IndentedJSON(http.StatusOK, "deleted succesfully")
 
 }
 func (t *TaskController) HandlePost(c *gin.Context) {
@@ -144,6 +183,6 @@ func (t *TaskController) HandlePost(c *gin.Context) {
 		return
 	}
 	t.TaskList[int_id] = newTask
-	c.IndentedJSON(200, "sucessfully Added a new task")
+	c.IndentedJSON(http.StatusCreated, "sucessfully Added a new task")
 
 }
