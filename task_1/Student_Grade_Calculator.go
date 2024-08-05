@@ -21,8 +21,11 @@ func (sub subject) getSubjectName(r *bufio.Reader) string {
 	if err != nil {
 		fmt.Print("subject name canot be empty try again: ")
 		subjectName, err = r.ReadString('\n')
+		if err != nil {
+			fmt.Println(err)
+		}
 	} else {
-		strings.Trim(subjectName, " ")
+		subjectName = strings.Trim(subjectName, " ")
 		if len(subjectName) == 0 {
 			fmt.Print("subject name canot be empty try again: ")
 			sub.getSubjectName(r)
@@ -53,16 +56,50 @@ type student struct {
 	subjects []subject
 }
 
-func (stdt student) getStudentName() string {
-	fmt.Print("Enter Your name: ")
-	var fname, lname string
-	fmt.Scanln(&fname, &lname)
-	for (len(fname) <= 2 || !IsLetterOnly(fname)) || (len(lname) <= 2 || !IsLetterOnly(lname)) {
+func (stdt student) getStudentName(reader *bufio.Reader) string {
+	fmt.Print("\nEnter Your First name: ")
+	fname, err := reader.ReadString('\n')
+	fname = strings.Trim(fname, "\n")
+	fname = strings.Trim(fname, " ")
+	if err != nil {
+		fmt.Print(err)
+	}
+	for len(fname) <= 2 || !IsLetterOnly(fname) {
 		fmt.Println(" ")
-		fmt.Printf("The name you entered ==> %s %s is invalid please enter a real name containing only letters: ", fname, lname)
-		fmt.Scanln(&fname, &lname)
+		fmt.Printf("The first name you entered ==> %s is invalid please enter a real name containing only letters: ", fname)
+		fmt.Print("\nEnter Your First name: ")
+		fname, err = reader.ReadString('\n')
+		fname = strings.Trim(fname, " ")
+
+		fname = strings.Trim(fname, "\n")
+
+		if err != nil {
+			fmt.Print(err)
+		}
 
 	}
+	fmt.Print("\nEnter Your Last name: ")
+	lname, err := reader.ReadString('\n')
+	lname = strings.Trim(lname, "\n")
+	lname = strings.Trim(lname, " ")
+
+	if err != nil {
+		fmt.Print(err)
+	}
+	for len(lname) <= 2 || !IsLetterOnly(lname) {
+		fmt.Println(" ")
+		fmt.Printf("The last name you entered ==> %s is invalid please enter a real name containing only letters: ", lname)
+		fmt.Print("\nEnter Your last name: ")
+		lname, err = reader.ReadString('\n')
+		lname = strings.Trim(lname, "\n")
+		lname = strings.Trim(lname, " ")
+
+		if err != nil {
+			fmt.Print(err)
+		}
+
+	}
+
 	return fname + " " + lname
 }
 
@@ -80,7 +117,7 @@ func (stdt student) displayStudentInfo() {
 		fmt.Println("_________________________________________")
 		sm += sub.grade
 	}
-	fmt.Printf("|%-15v|%-24.3f|\n", "total", sm)
+	fmt.Printf("|%-15v|%-10.3f of of %v    |\n", "total", sm, len(stdt.subjects)*100)
 	fmt.Println("_________________________________________")
 
 	fmt.Printf("|%-15v|%-24.3f|\n", "average", sm/float64(len(stdt.subjects)))
@@ -107,7 +144,7 @@ func askChoice(r *bufio.Reader) {
 	switch choice {
 	case 1:
 		std1 := student{}
-		std1.name = std1.getStudentName()
+		std1.name = std1.getStudentName(r)
 
 		fmt.Print("Enter the number of subjects taken: ")
 		var no_subjects string
@@ -135,7 +172,6 @@ func askChoice(r *bufio.Reader) {
 		askChoice(r)
 	case 2:
 		fmt.Println("exiting...")
-		break
 	default:
 		askChoice(r)
 
