@@ -66,7 +66,7 @@ func (stdt student) getStudentName(reader *bufio.Reader) string {
 	}
 	for len(fname) <= 2 || !IsLetterOnly(fname) {
 		fmt.Println(" ")
-		fmt.Printf("The first name you entered ==> %s is invalid please enter a real name containing only letters: ", fname)
+		fmt.Printf("The first name you entered ==> %s is invalid please enter a real name containing only letters and at least 3 characters long: ", fname)
 		fmt.Print("\nEnter Your First name: ")
 		fname, err = reader.ReadString('\n')
 		fname = strings.Trim(fname, " ")
@@ -88,7 +88,7 @@ func (stdt student) getStudentName(reader *bufio.Reader) string {
 	}
 	for len(lname) <= 2 || !IsLetterOnly(lname) {
 		fmt.Println(" ")
-		fmt.Printf("The last name you entered ==> %s is invalid please enter a real name containing only letters: ", lname)
+		fmt.Printf("The last name you entered ==> %s is invalid please enter a real name containing only letters and at least 3 characters long: ", lname)
 		fmt.Print("\nEnter Your last name: ")
 		lname, err = reader.ReadString('\n')
 		lname = strings.Trim(lname, "\n")
