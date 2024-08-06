@@ -46,38 +46,40 @@ func (c *DB) DisConnect(client *mongo.Client) {
 	fmt.Println("connection to MONGODB closed")
 }
 
-func (c *DB) ListAlltasks(collection mongo.Collection) []models.Task{
+func (c *DB) ListAlltasks(collection mongo.Collection) {
 	findOption := options.Find()
 	findOption.SetLimit(100)
-	tasks := []models.Task{}
 	cursor, err := collection.Find(context.TODO(), bson.D{}, findOption)
 	if err != nil {
 		fmt.Println("could not load all the tasks 1")
-		return tasks
 	}
+	fmt.Println("________________________________________________________________________________________________")
+	fmt.Printf("|%-10v|%-20v|%-40v|%-10v|%-10v|\n", "Task Id", "Title", "Description", "Status", "Due Date")
+	fmt.Println("________________________________________________________________________________________________")
 	for cursor.Next(context.TODO()) {
 		var task models.Task
 		err := cursor.Decode(&task)
 		if err != nil {
 			fmt.Println(err)
-		}else{
-			tasks = append(tasks,task)
-
+			break
 		}
+		Disply(task)
 	}
-	return tasks
 }
 
-func (c *DB) Gettasks(collection mongo.Collection) models.Task {
+func (c *DB) Gettasks(collection mongo.Collection) {
 	id, _ := helper.ReadInteger("Enter the id: ", reader, 10000000, 0)
 	var result models.Task
 	filter := bson.D{{Key: "id", Value: id}}
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		fmt.Println("could not find a result")
-		return result
+		return
 	}
-	return result
+	fmt.Println("________________________________________________________________________________________________")
+	fmt.Printf("|%-10v|%-20v|%-40v|%-10v|%-10v|\n", "Task Id", "Title", "Description", "Status", "Due Date")
+	fmt.Println("________________________________________________________________________________________________")
+	Disply(result)
 }
 
 func (c *DB) Filter(collection mongo.Collection, reader *bufio.Reader) {
@@ -90,7 +92,7 @@ func (c *DB) Filter(collection mongo.Collection, reader *bufio.Reader) {
 	c.FilterBy(title, description, status, collection)
 }
 
-func (c *DB) FilterBy(title string, description string, status string, collection mongo.Collection) []models.Task{
+func (c *DB) FilterBy(title string, description string, status string, collection mongo.Collection) {
 	findOptions := options.Find()
 	findOptions.SetLimit(100)
 	filter := bson.M{}
@@ -107,20 +109,21 @@ func (c *DB) FilterBy(title string, description string, status string, collectio
 	if err != nil {
 		log.Fatal(err)
 	}
-	result := []models.Task{}
+	fmt.Println("________________________________________________________________________________________________")
+	fmt.Printf("|%-10v|%-20v|%-40v|%-10v|%-10v|\n", "Task Id", "Title", "Description", "Status", "Due Date")
+	fmt.Println("________________________________________________________________________________________________")
 	for cur.Next(context.TODO()) {
 		var elem models.Task
 		err := cur.Decode(&elem)
 		if err != nil {
 			log.Fatal(err)
 		}
-		result = append(result, elem)
+		Disply(elem)
 	}
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
 	cur.Close(context.TODO())
-	return result
 }
 
 func (c *DB) GetTasksGivenId(id int, collection mongo.Collection) bool {
