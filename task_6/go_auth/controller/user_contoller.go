@@ -81,7 +81,7 @@ func HandleLogin(c *gin.Context) {
 		return
 	}
 	if !hashing.VerifyPassword(password, user.Password) {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"error": password + " " + user.Password + " Invalid credentials"})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"error": " Invalid credentials"})
 		return
 	}
 

@@ -1,222 +1,220 @@
-# [API Documentation](https://documenter.getpostman.com/view/37276877/2sA3rzLZ3P) 
+# API Documentation for Go Server using Gin Gonic
+
+This API allows users to manage tasks and users with role-based access control using JWT (JSON Web Tokens) for authentication. The API is divided into two main groups of routes: `/task` and `/user`. Below is the detailed documentation for each endpoint:
 
 ## Base URL
+```
 http://localhost:8080
-
-### Authentication
-All endpoints except /login and /signup require a JWT token to be provided in the Authorization header.
-
-### Error Responses
-All error responses will have a JSON structure:
-
-```json
- {
-  "error": "error message"
-  }
 ```
-#### Success Responses
-Success responses will vary depending on the endpoint, typically returning the relevant data or a success message.
 
-Endpoints
-POST /login
-Description: Logs in a user and returns a JWT token.
+## Authentication
+All routes under `/task` and `/user` require JWT authentication via the `Authorization` header. Admin routes require the user to have an "admin" role.
 
-Request:
-
-```json
-{
-  "username": "string",
-  "password": "string"
-}
+### Authorization Header Example
 ```
-Response:
-```json
-{
-  "token": "JWT token"
-}
+Authorization:  <JWT_TOKEN>
 ```
-### Example:
 
-```sh
-curl -X POST http://localhost:8080/login \
-  -d "username=example" \
-  -d "password=password123"
-POST /signup
-Description: Signs up a new user.
+## Endpoints
 
-Request:
+### **POST /login**
 
-json
-Copy code
-{
-  "username": "string",
-  "password": "string"
-}
-Response:
+#### Description
+Logs in a user and returns a JWT token.
 
-json
-Copy code
-{
-  "message": "sucessfully registered a user"
-}
-Example:
+#### Request Parameters
+- `username` (form data) - The username of the user.
+- `password` (form data) - The password of the user.
 
-sh
-Copy code
-curl -X POST http://localhost:8080/signup \
-  -d "username=example" \
-  -d "password=password123"
-GET /task/all
-Description: Retrieves all tasks.
+#### Response
+- `200 OK`: Returns the JWT token.
+- `404 Not Found`: If the user is not found or the credentials are invalid.
 
-Request: Requires JWT token in Authorization header.
+---
 
-Response:
+### **POST /signup**
 
-json
-Copy code
-[
-  {
-    "id": 1,
-    "title": "Task 1",
-    "description": "Description of Task 1",
-    "due_date": "2024-12-31",
-    "status": "open"
-  },
-  ...
-]
-Example:
+#### Description
+Registers a new user.
 
-sh
-Copy code
-curl -H "Authorization: Bearer <token>" http://localhost:8080/task/all
-POST /task
-Description: Adds a new task. Only accessible by admins.
+#### Request Parameters
+- `username` (form data) - The desired username.
+- `password` (form data) - The desired password.
 
-Request: Requires JWT token in Authorization header.
+#### Response
+- `202 Accepted`: If the user is successfully registered.
+- `409 Conflict`: If the username is already taken.
 
-Body:
+---
 
-json
-Copy code
-{
-  "id": 1,
-  "title": "Task 1",
-  "description": "Description of Task 1",
-  "due_date": "2024-12-31",
-  "status": "open"
-}
-Response:
+### **Task Management Endpoints**
 
-json
-Copy code
-{
-  "message": "task added successfully"
-}
-Example:
+All task management routes are under the `/task` group and require JWT authentication.
 
-sh
-Copy code
-curl -X POST http://localhost:8080/task \
-  -H "Authorization: Bearer <token>" \
-  -d "id=1" \
-  -d "title=Task 1" \
-  -d "description=Description of Task 1" \
-  -d "due_date=2024-12-31" \
-  -d "status=open"
-PUT /task/
-Description: Edits an existing task. Only accessible by admins.
+#### **GET /task/all**
 
-Request: Requires JWT token in Authorization header.
+##### Description
+Fetches all tasks.
 
-Body:
+##### Response
+- `200 OK`: Returns a list of all tasks.
+- `200 OK`: Returns a message if no tasks are available.
 
-json
-Copy code
-{
-  "title": "Updated Task Title",
-  "description": "Updated Task Description",
-  "due_date": "2024-12-31",
-  "status": "completed"
-}
-Response:
+---
 
-json
-Copy code
-{
-  "message": "task edited successfully"
-}
-Example:
+#### **GET /task/:id**
 
-sh
-Copy code
-curl -X PUT http://localhost:8080/task/1 \
-  -H "Authorization: Bearer <token>" \
-  -d "title=Updated Task Title" \
-  -d "description=Updated Task Description" \
-  -d "due_date=2024-12-31" \
-  -d "status=completed"
-DELETE /task/
-Description: Removes an existing task. Only accessible by admins.
+##### Description
+Fetches a task by its ID.
 
-Request: Requires JWT token in Authorization header.
+##### Request Parameters
+- `id` (URL path) - The ID of the task.
 
-Response:
+##### Response
+- `200 OK`: Returns the task.
+- `200 OK`: Returns a message if no task is found with the given ID.
 
-json
-Copy code
-{
-  "message": "task removed successfully"
-}
-Example:
+---
 
-sh
-Copy code
-curl -X DELETE http://localhost:8080/task/1 \
-  -H "Authorization: Bearer <token>"
-PATCH /user/promote/
-Description: Promotes a user to admin. Only accessible by admins.
+#### **GET /task/filter**
 
-Request: Requires JWT token in Authorization header.
+##### Description
+Filters tasks based on the provided criteria.
 
-Response:
+##### Request Parameters
+- `title` (form data) - The title of the task (optional).
+- `description` (form data) - The description of the task (optional).
+- `status` (form data) - The status of the task (optional).
+- `duedate` (form data) - The due date of the task (optional).
 
-json
-Copy code
-{
-  "message": "promoted user successfully"
-}
-Example:
+##### Response
+- `200 OK`: Returns the list of tasks that match the filter criteria.
+- `200 OK`: Returns a message if no tasks match the filter.
 
-sh
-Copy code
-curl -X PATCH http://localhost:8080/user/promote/example \
-  -H "Authorization: Bearer <token>"
-GET /user/all
-Description: Retrieves all users. Only accessible by admins.
+---
 
-Request: Requires JWT token in Authorization header.
+#### **POST /task/**
 
-Response:
+##### Description
+Adds a new task (Admin only).
 
-json
-Copy code
-[
-  {
-    "username": "example",
-    "role": "admin"
-  },
-  ...
-]
-Example:
+##### Request Parameters
+- `id` (form data) - The ID of the task (integer).
+- `title` (form data) - The title of the task.
+- `description` (form data) - The description of the task.
+- `due_date` (form data) - The due date of the task.
+- `status` (form data) - The status of the task.
 
-sh
-Copy code
-curl -H "Authorization: Bearer <token>" http://localhost:8080/user/all
-Models
-Task
-json
-Copy code
+##### Response
+- `201 Created`: If the task is successfully added.
+- `400 Bad Request`: If the ID is already taken or an error occurs.
+
+---
+
+#### **PATCH /task/:id**
+
+##### Description
+Edits an existing task (Admin only).
+
+##### Request Parameters
+- `id` (URL path) - The ID of the task (integer).
+- `title` (form data) - The new title of the task (optional).
+- `description` (form data) - The new description of the task (optional).
+- `due_date` (form data) - The new due date of the task (optional).
+- `status` (form data) - The new status of the task (optional).
+
+##### Response
+- `200 OK`: If the task is successfully edited.
+- `400 Bad Request`: If the task with the given ID is not found or an error occurs.
+
+---
+
+#### **DELETE /task/:id**
+
+##### Description
+Removes a task by its ID (Admin only).
+
+##### Request Parameters
+- `id` (URL path) - The ID of the task (integer).
+
+##### Response
+- `200 OK`: If the task is successfully removed.
+- `404 Not Found`: If the task with the given ID is not found.
+
+---
+
+### **User Management Endpoints**
+
+All user management routes are under the `/user` group and require JWT authentication.
+
+#### **GET /user/all**
+
+##### Description
+Fetches all users (Admin only).
+
+##### Response
+- `200 OK`: Returns a list of all users.
+- `200 OK`: Returns a message if no users are available.
+
+---
+
+#### **GET /user/:role**
+
+##### Description
+Fetches all users with a specific role (Admin only).
+
+##### Request Parameters
+- `role` (URL path) - The role of the users to be fetched (e.g., `admin`, `user`).
+
+##### Response
+- `200 OK`: Returns a list of users with the specified role.
+- `200 OK`: Returns a message if no users are found with the given role.
+
+---
+
+#### **GET /user/u/:username**
+
+##### Description
+Fetches a user by their username (Admin only).
+
+##### Request Parameters
+- `username` (URL path) - The username of the user.
+
+##### Response
+- `200 OK`: Returns the user details.
+- `200 OK`: Returns a message if no user is found with the given username.
+
+---
+
+#### **PATCH /user/:username**
+
+##### Description
+Promotes a user to an admin (Admin only).
+
+##### Request Parameters
+- `username` (URL path) - The username of the user to be promoted.
+
+##### Response
+- `200 OK`: If the user is successfully promoted.
+- `400 Bad Request`: If the user is already an admin or an error occurs.
+
+---
+
+## Middleware
+
+### **AuthMiddleware**
+This middleware checks if the request has a valid JWT token. If the token is valid, it allows the request to proceed; otherwise, it responds with `401 Unauthorized`.
+
+### **AdminMiddleware**
+This middleware checks if the user has an "admin" role. If the user is an admin, the request proceeds; otherwise, it responds with `403 Forbidden`.
+
+### **UserMiddleware**
+This middleware checks if the user has a "user" or "admin" role. If the user has one of these roles, the request proceeds; otherwise, it responds with `403 Forbidden`.
+
+## Models
+
+### **Task**
+```json
 {
   "id": int,
   "title": string,
@@ -224,21 +222,13 @@ Copy code
   "due_date": string,
   "status": string
 }
-User
-json
-Copy code
+```
+
+### **User**
+```json
 {
   "username": string,
   "password": string,
   "role": string
 }
-JWT Authentication Middleware
-AuthMiddleware
-Validates the JWT token provided in the Authorization header.
-
-AdminMiddleware
-Ensures the user has the role of "admin".
-
-UserMiddleware
-Ensures the user has the role of either "admin" or "user".
-
+```
