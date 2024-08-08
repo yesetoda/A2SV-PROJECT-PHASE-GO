@@ -1,4 +1,4 @@
-package data
+package services
 
 import (
 	"context"
@@ -10,30 +10,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-type DB struct {
-}
-
-func (c *DB) ConnetTOCOllection() (*mongo.Client, error) {
-	clientOption := options.Client().ApplyURI("mongodb://localhost:27017")
-	client, err := mongo.Connect(context.TODO(), clientOption)
-	if err != nil {
-		return nil, err
-	}
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
-func (c *DB) DisConnect(client *mongo.Client) error {
-	err := client.Disconnect(context.TODO())
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 func (c *DB) ListAlltasks(collection mongo.Collection) []models.Task {
 	findOption := options.Find()
@@ -76,7 +52,7 @@ func (c *DB) GetTasksGivenId(id int, collection mongo.Collection) bool {
 	return collection.FindOne(context.TODO(), filter).Decode(&result) == nil
 }
 
-func (c *DB) FilterBy(title string, description string, status string, collection mongo.Collection) []models.Task {
+func (c *DB) FilterBy(title string, description string, status string, duedate string, collection mongo.Collection) []models.Task {
 	findOptions := options.Find()
 	findOptions.SetLimit(100)
 	filter := bson.M{}
@@ -88,6 +64,9 @@ func (c *DB) FilterBy(title string, description string, status string, collectio
 	}
 	if len(status) > 0 {
 		filter["status"] = status
+	}
+	if len(duedate) > 0 {
+		filter["duedate"] = duedate
 	}
 	fmt.Println("this is the filter", filter)
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
@@ -126,20 +105,29 @@ func (c *DB) RegisterNewtasks(collection mongo.Collection, task models.Task) (bo
 
 func (c *DB) Updatetask(collection mongo.Collection, id int, title string, description string, status string, due_date string) (bool, string) {
 	if c.GetTasksGivenId(id, collection) {
-		update := bson.M{
-			"$set": bson.M{
-				"title":       title,
-				"description": description,
-				"due_date":    due_date,
-				"status":      status,
-			}}
+		updated := bson.M{}
+
+		if len(title) > 0 {
+			updated["title"] = title
+		}
+		if len(description) > 0 {
+			updated["description"] = description
+		}
+		if len(status) > 0 {
+			updated["status"] = status
+		}
+		if len(due_date) > 0 {
+			updated["duedate"] = due_date
+		}
 		filter := bson.M{
 			"id": id,
+		}
+		update := bson.M{
+			"$set": updated,
 		}
 		fmt.Println("this is the filter: ", filter)
 		fmt.Println("this is the update: ", update)
 
-		// updateOptions := options.Update().SetUpsert(false)
 		result, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			return false, "update not allowed " + err.Error()
@@ -160,7 +148,7 @@ func (c *DB) Removetask(id int, collection mongo.Collection) (bool, string) {
 		}}
 		result, err := collection.DeleteOne(context.TODO(), filter)
 		if err != nil {
-			return false, "err"
+			return false, err.Error()
 		}
 		return true, "the task is removed " + strconv.FormatInt(result.DeletedCount, 10)
 	} else {
@@ -168,10 +156,3 @@ func (c *DB) Removetask(id int, collection mongo.Collection) (bool, string) {
 
 	}
 }
-
-func (c *DB) FindUser(username string, collection mongo.Collection) bool {
-	var result models.User
-	filter := bson.D{{Key: "username", Value: username}}
-	return collection.FindOne(context.TODO(), filter).Decode(&result) == nil
-}
-

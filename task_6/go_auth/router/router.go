@@ -9,22 +9,26 @@ import (
 
 func HandleRoutes() {
 	r := gin.Default()
-
-	// Route for generating tokens
-
 	r.POST("/login", controller.HandleLogin)
 	r.POST("/signup", controller.HandleSignUp)
 
-	// Middleware to check JWT on every request
-	// TODO: any thing below this is treated as a protected route
-	r.Use(middleware.AuthMiddleware())
-
-	// Protected routes
-	r.GET("/tasks", middleware.UserMiddleware(), controller.HandleViewTasks)
-	r.PATCH("/promote/:username", middleware.AdminMiddleware(), controller.HandlePromote)
-	r.POST("/task", middleware.AdminMiddleware(), controller.HandleAddTask)
-	r.PATCH("/task/:id", middleware.AdminMiddleware(), controller.HandleEditTask)
-	r.DELETE("/task/:id", middleware.AdminMiddleware(), controller.HandleRemoveTask)
-	r.GET("/users", middleware.AdminMiddleware(), controller.HandleViewUsers)
+	tasks := r.Group("/task")
+	tasks.Use(middleware.AuthMiddleware())
+	{
+		tasks.GET("/all", middleware.UserMiddleware(), controller.HandleViewTasks)
+		tasks.GET("/:id", middleware.UserMiddleware(), controller.HandleFindTask)
+		tasks.GET("/filter", middleware.UserMiddleware(), controller.HandleFilterTasks)
+		tasks.POST("/", middleware.AdminMiddleware(), controller.HandleAddTask)
+		tasks.PATCH("/:id", middleware.AdminMiddleware(), controller.HandleEditTask)
+		tasks.DELETE("/:id", middleware.AdminMiddleware(), controller.HandleRemoveTask)
+	}
+	users := r.Group("/user")
+	users.Use(middleware.AuthMiddleware())
+	{
+		users.GET("/all", middleware.AdminMiddleware(), controller.HandleViewAllUsers)
+		users.GET("/:role", middleware.AdminMiddleware(), controller.HandleRoleBasedUsersView)
+		users.GET("/u/:username", middleware.AdminMiddleware(), controller.HandleFindUsers)
+		users.PATCH("/:username", middleware.AdminMiddleware(), controller.HandlePromote)
+	}
 	r.Run(":8080")
 }

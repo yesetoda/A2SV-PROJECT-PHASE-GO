@@ -3,14 +3,14 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-const secretKey = "my_secret_key"
-
 func AuthMiddleware() gin.HandlerFunc {
+	var secretKey = os.Getenv("MySecret")
 	return func(c *gin.Context) {
 		tokenString := c.GetHeader("Authorization")
 
@@ -31,6 +31,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		// Set the token claims to the context
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("claims", claims)
+			fmt.Println(claims)
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
@@ -47,7 +48,7 @@ func AdminMiddleware() gin.HandlerFunc {
 		role := claims["role"].(string)
 
 		if role != "admin" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "UnAuthorized", "message": "must be an admin to do such task"})
 			c.Abort()
 			return
 		}
@@ -56,16 +57,12 @@ func AdminMiddleware() gin.HandlerFunc {
 	}
 }
 
-
 func UserMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		claims := c.MustGet("claims").(jwt.MapClaims)
 		role := claims["role"].(string)
-		fmt.Println("this is the role that we found:", role)
-		fmt.Println(role != "admin" && role != "user")
-
 		if role != "admin" && role != "user" {
-			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden by login middleware"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "you must log in first"})
 			c.Abort()
 			return
 		}

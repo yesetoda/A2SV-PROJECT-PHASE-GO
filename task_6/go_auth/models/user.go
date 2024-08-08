@@ -5,7 +5,3 @@ type User struct {
 	Password string `json:"_"`
 	Role     string `json:"role"`
 }
-
-type UserCollection struct {
-	Users []User
-}
