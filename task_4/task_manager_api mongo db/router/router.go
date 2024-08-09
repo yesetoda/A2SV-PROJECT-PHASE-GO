@@ -8,12 +8,12 @@ import (
 
 var ()
 
-func Router(router *gin.Engine, t controllers.TaskController) {
-	router.GET("/", t.HandleLandingPage)
-	router.GET("/tasks", t.HandleGetAll)
-	router.GET("/tasks/:id", t.HandleGetById)
-	router.PUT("/tasks/:id", t.HandleUpdate)
-	router.PATCH("/tasks/:id", t.HandleUpdateField)
-	router.DELETE("/tasks/:id", t.HandleDelete)
-	router.POST("/tasks", t.HandlePost)
+func Router(router *gin.Engine) {
+	router.GET("/", controllers.HandleLandingPage)
+	router.GET("/tasks",controllers.HandleGetAll)
+	router.GET("/tasks/:id",controllers.HandleGetById)
+	router.PUT("/tasks/:id",controllers.HandleUpdate)
+	router.PATCH("/tasks/:id",controllers.HandleUpdateField)
+	router.DELETE("/tasks/:id",controllers.HandleDelete)
+	router.POST("/tasks",controllers.HandlePost)
 }
